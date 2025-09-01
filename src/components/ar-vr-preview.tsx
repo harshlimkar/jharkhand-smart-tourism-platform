@@ -36,7 +36,8 @@ import {
   AlertTriangle,
   CheckCircle,
   X,
-  Download
+  Download,
+  Navigation
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,47 @@ import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+
+// Add new interfaces for 3D Street View
+interface StreetView {
+  id: string;
+  title: string;
+  description: string;
+  startPoint: { lat: number; lng: number };
+  endPoint: { lat: number; lng: number };
+  waypoints: StreetViewPoint[];
+  duration: number;
+  difficulty: 'easy' | 'moderate' | 'advanced';
+  highlights: string[];
+  culturalSites: CulturalSite[];
+}
+
+interface StreetViewPoint {
+  id: string;
+  coordinates: { lat: number; lng: number };
+  title: string;
+  description: string;
+  panoramaUrl: string;
+  interactiveElements: InteractiveElement[];
+  culturalContext?: string;
+  tribalSignificance?: string;
+}
+
+interface CulturalSite {
+  id: string;
+  name: string;
+  type: 'temple' | 'tribal-site' | 'market' | 'heritage' | 'residential';
+  significance: string;
+  respectProtocols: string[];
+}
+
+interface InteractiveElement {
+  id: string;
+  type: 'hotspot' | 'info-panel' | 'audio-guide' | 'cultural-overlay';
+  position: { x: number; y: number };
+  content: string;
+  mediaUrl?: string;
+}
 
 interface Destination {
   id: string;
@@ -108,6 +150,266 @@ interface AudioGuide {
   duration: number;
   preview: string;
 }
+
+// Add street view data
+const streetViewTours: StreetView[] = [
+  {
+    id: 'netarhat-village-walk',
+    title: 'Netarhat Village Street Tour',
+    description: 'Virtual walking tour through the traditional streets of Netarhat hill station',
+    startPoint: { lat: 23.4667, lng: 84.2500 },
+    endPoint: { lat: 23.4687, lng: 84.2520 },
+    duration: 25,
+    difficulty: 'easy',
+    highlights: [
+      'Traditional hill station architecture',
+      'Local market interactions',
+      'Scenic viewpoints',
+      'Cultural heritage sites'
+    ],
+    waypoints: [
+      {
+        id: 'market-square',
+        coordinates: { lat: 23.4670, lng: 84.2505 },
+        title: 'Netarhat Market Square',
+        description: 'Traditional hill station market with local crafts and fresh produce',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'market-info',
+            type: 'info-panel',
+            position: { x: 50, y: 30 },
+            content: 'This market has been the heart of Netarhat for over 100 years. Local tribes bring their handicrafts and organic produce here.',
+          },
+          {
+            id: 'craft-stall',
+            type: 'hotspot',
+            position: { x: 70, y: 40 },
+            content: 'Traditional Dokra metal craft stall - click to learn about the ancient art form',
+            mediaUrl: '/audio/dokra-explanation.mp3'
+          }
+        ],
+        culturalContext: 'Central gathering place for local tribal communities',
+        tribalSignificance: 'Weekly market where Munda and Oraon tribes trade traditional goods'
+      },
+      {
+        id: 'heritage-street',
+        coordinates: { lat: 23.4675, lng: 84.2510 },
+        title: 'Colonial Heritage Street',
+        description: 'Historic street with colonial-era buildings and traditional tribal homes',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'colonial-building',
+            type: 'cultural-overlay',
+            position: { x: 40, y: 35 },
+            content: 'Former British rest house, now a heritage hotel showcasing local architecture'
+          },
+          {
+            id: 'tribal-home',
+            type: 'hotspot',
+            position: { x: 80, y: 50 },
+            content: 'Traditional tribal home architecture - note the slanted roof design for monsoon protection'
+          }
+        ]
+      },
+      {
+        id: 'sunset-point-approach',
+        coordinates: { lat: 23.4680, lng: 84.2515 },
+        title: 'Path to Sunset Point',
+        description: 'Scenic walking path leading to the famous Netarhat sunset viewpoint',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'tribal-guide',
+            type: 'audio-guide',
+            position: { x: 60, y: 45 },
+            content: 'Listen to tribal elder share stories about sacred sunset rituals',
+            mediaUrl: '/audio/sunset-stories.mp3'
+          }
+        ],
+        tribalSignificance: 'Sacred path used by tribes for sunrise and sunset prayers'
+      }
+    ],
+    culturalSites: [
+      {
+        id: 'tribal-community-center',
+        name: 'Munda Community Center',
+        type: 'tribal-site',
+        significance: 'Traditional meeting place and cultural center for local Munda tribe',
+        respectProtocols: [
+          'Remove shoes before entering',
+          'Ask permission before photographing',
+          'Maintain quiet during community meetings'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'ranchi-main-road',
+    title: 'Ranchi Main Road Experience',
+    description: '3D street view of bustling Ranchi city streets with cultural landmarks',
+    startPoint: { lat: 23.3441, lng: 85.3096 },
+    endPoint: { lat: 23.3461, lng: 85.3116 },
+    duration: 30,
+    difficulty: 'moderate',
+    highlights: [
+      'Urban Jharkhand lifestyle',
+      'Traditional shops and eateries',
+      'Cultural diversity',
+      'Modern infrastructure'
+    ],
+    waypoints: [
+      {
+        id: 'main-chowk',
+        coordinates: { lat: 23.3445, lng: 85.3100 },
+        title: 'Ranchi Main Chowk',
+        description: 'Central hub of Ranchi with mix of traditional and modern elements',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'street-food',
+            type: 'hotspot',
+            position: { x: 30, y: 60 },
+            content: 'Traditional Jharkhand street food - try litti chokha and thekua',
+          },
+          {
+            id: 'transport-hub',
+            type: 'info-panel',
+            position: { x: 70, y: 30 },
+            content: 'Major transport junction - buses, taxis, and auto-rickshaws to all destinations'
+          }
+        ]
+      },
+      {
+        id: 'cultural-center',
+        coordinates: { lat: 23.3450, lng: 85.3105 },
+        title: 'Jharkhand Cultural Center',
+        description: 'Hub for tribal art, music, and cultural performances',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'art-display',
+            type: 'cultural-overlay',
+            position: { x: 50, y: 40 },
+            content: 'Live display of tribal art forms including Sohrai and Kohbar paintings'
+          }
+        ],
+        culturalContext: 'Premier showcase of Jharkhand tribal heritage and contemporary culture'
+      }
+    ],
+    culturalSites: [
+      {
+        id: 'jagannath-temple',
+        name: 'Jagannath Temple',
+        type: 'temple',
+        significance: 'Important Hindu temple blending traditional and tribal worship practices',
+        respectProtocols: [
+          'Dress modestly',
+          'Remove shoes before entering',
+          'Photography may be restricted'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'tribal-village-tour',
+    title: 'Santhal Village Street Experience',
+    description: 'Immersive 3D tour through authentic Santhal tribal village streets',
+    startPoint: { lat: 24.7500, lng: 87.3000 },
+    endPoint: { lat: 24.7520, lng: 87.3020 },
+    duration: 35,
+    difficulty: 'easy',
+    highlights: [
+      'Traditional tribal architecture',
+      'Community spaces and practices',
+      'Agricultural activities',
+      'Cultural ceremonies'
+    ],
+    waypoints: [
+      {
+        id: 'village-entrance',
+        coordinates: { lat: 24.7505, lng: 87.3005 },
+        title: 'Village Entrance Gate',
+        description: 'Traditional Santhal village entrance with community welcome area',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'welcome-ceremony',
+            type: 'cultural-overlay',
+            position: { x: 45, y: 35 },
+            content: 'Traditional Santhal welcome ceremony with tribal music and dance'
+          },
+          {
+            id: 'village-rules',
+            type: 'info-panel',
+            position: { x: 75, y: 25 },
+            content: 'Village guidelines for respectful interaction with tribal community'
+          }
+        ],
+        tribalSignificance: 'Sacred entrance where visitors are welcomed according to tribal customs'
+      },
+      {
+        id: 'community-center',
+        coordinates: { lat: 24.7510, lng: 87.3010 },
+        title: 'Village Community Center',
+        description: 'Central gathering place for community meetings and cultural events',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'tribal-council',
+            type: 'hotspot',
+            position: { x: 60, y: 45 },
+            content: 'Traditional tribal council meeting area - learn about democratic governance'
+          },
+          {
+            id: 'cultural-performances',
+            type: 'audio-guide',
+            position: { x: 40, y: 55 },
+            content: 'Experience traditional Santhal music and dance performances',
+            mediaUrl: '/audio/santhal-music.mp3'
+          }
+        ]
+      },
+      {
+        id: 'craft-workshop-street',
+        coordinates: { lat: 24.7515, lng: 87.3015 },
+        title: 'Artisan Workshop Street',
+        description: 'Street lined with traditional craft workshops and artisan homes',
+        panoramaUrl: '/api/placeholder/1200/600',
+        interactiveElements: [
+          {
+            id: 'weaving-workshop',
+            type: 'hotspot',
+            position: { x: 35, y: 40 },
+            content: 'Traditional weaving workshop - watch artisans create tribal textiles'
+          },
+          {
+            id: 'pottery-studio',
+            type: 'cultural-overlay',
+            position: { x: 65, y: 50 },
+            content: 'Clay pottery studio using traditional tribal techniques'
+          }
+        ],
+        culturalContext: 'Center of traditional craft production preserving ancient techniques'
+      }
+    ],
+    culturalSites: [
+      {
+        id: 'sacred-grove',
+        name: 'Village Sacred Grove',
+        type: 'tribal-site',
+        significance: 'Sacred forest area where tribal deities are worshipped',
+        respectProtocols: [
+          'Entry only with tribal guide',
+          'No photography in sacred areas',
+          'Maintain complete silence',
+          'Remove shoes and cover head'
+        ]
+      }
+    ]
+  }
+];
 
 const destinations: Destination[] = [
   {
@@ -328,6 +630,14 @@ export const ARVRPreviewComponent = () => {
   const [cameraPermission, setCameraPermission] = useState<'granted' | 'denied' | 'pending'>('pending');
   const [selectedAudioGuide, setSelectedAudioGuide] = useState<AudioGuide | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [streetViewMode, setStreetViewMode] = useState(false);
+  const [selectedStreetView, setSelectedStreetView] = useState<StreetView | null>(null);
+  const [currentWaypoint, setCurrentWaypoint] = useState(0);
+  const [streetViewProgress, setStreetViewProgress] = useState(0);
+  const [showInteractiveElements, setShowInteractiveElements] = useState(true);
+  const [selectedElement, setSelectedElement] = useState<InteractiveElement | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigationSpeed, setNavigationSpeed] = useState(1);
 
   const vrViewerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -422,6 +732,73 @@ export const ARVRPreviewComponent = () => {
     setShowBookingDialog(true);
     toast.success('Redirecting to booking system...');
   }, []);
+
+  const handleStreetViewStart = useCallback(async (streetView: StreetView) => {
+    setIsLoading(true);
+    setSelectedStreetView(streetView);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setStreetViewMode(true);
+      setCurrentWaypoint(0);
+      setStreetViewProgress(0);
+      setIsNavigating(false);
+      toast.success(`Starting ${streetView.title}`);
+    } catch (error) {
+      toast.error('Failed to load street view experience');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleNavigateStreetView = useCallback((direction: 'forward' | 'backward') => {
+    if (!selectedStreetView) return;
+    
+    const maxWaypoints = selectedStreetView.waypoints.length - 1;
+    
+    if (direction === 'forward' && currentWaypoint < maxWaypoints) {
+      setCurrentWaypoint(prev => prev + 1);
+      setStreetViewProgress(((currentWaypoint + 1) / maxWaypoints) * 100);
+    } else if (direction === 'backward' && currentWaypoint > 0) {
+      setCurrentWaypoint(prev => prev - 1);
+      setStreetViewProgress(((currentWaypoint - 1) / maxWaypoints) * 100);
+    }
+  }, [selectedStreetView, currentWaypoint]);
+
+  const handleInteractiveElementClick = useCallback((element: InteractiveElement) => {
+    setSelectedElement(element);
+    
+    if (element.type === 'audio-guide' && element.mediaUrl) {
+      // Play audio guide
+      if (audioRef.current) {
+        audioRef.current.src = element.mediaUrl;
+        audioRef.current.play();
+      }
+    }
+    
+    toast.success('Interactive element activated');
+  }, []);
+
+  const toggleAutoNavigation = useCallback(() => {
+    setIsNavigating(!isNavigating);
+    
+    if (!isNavigating && selectedStreetView) {
+      // Start auto navigation
+      const interval = setInterval(() => {
+        setCurrentWaypoint(prev => {
+          const maxWaypoints = selectedStreetView.waypoints.length - 1;
+          if (prev >= maxWaypoints) {
+            setIsNavigating(false);
+            clearInterval(interval);
+            return prev;
+          }
+          const newWaypoint = prev + 1;
+          setStreetViewProgress((newWaypoint / maxWaypoints) * 100);
+          return newWaypoint;
+        });
+      }, 3000 / navigationSpeed);
+    }
+  }, [isNavigating, selectedStreetView, navigationSpeed]);
 
   // Simulate tour progress
   useEffect(() => {
@@ -539,7 +916,7 @@ export const ARVRPreviewComponent = () => {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="explore">
             <MapPin className="w-4 h-4 mr-2" />
             Explore
@@ -563,6 +940,10 @@ export const ARVRPreviewComponent = () => {
           <TabsTrigger value="audio">
             <Headphones className="w-4 h-4 mr-2" />
             Audio Guide
+          </TabsTrigger>
+          <TabsTrigger value="street-view">
+            <Navigation className="w-4 h-4 mr-2" />
+            3D Street View
           </TabsTrigger>
         </TabsList>
 
@@ -692,14 +1073,14 @@ export const ARVRPreviewComponent = () => {
                             variant="secondary"
                             onClick={handlePlayPause}
                           >
-                            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="secondary"
                             onClick={handleMuteToggle}
                           >
-                            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />
                           </Button>
                         </div>
                         <div className="flex items-center gap-2">
@@ -1048,10 +1429,10 @@ export const ARVRPreviewComponent = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Button size="sm" variant="outline" onClick={handleMuteToggle}>
-                          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />
                         </Button>
                         <Button size="sm" onClick={handlePlayPause}>
-                          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
@@ -1084,7 +1465,279 @@ export const ARVRPreviewComponent = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* 3D Street View Tab */}
+        <TabsContent value="street-view" className="space-y-6">
+          {streetViewMode && selectedStreetView ? (
+            <Card className="min-h-[600px]">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Navigation className="w-5 h-5" />
+                    {selectedStreetView.title}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleAutoNavigation}
+                    >
+                      {isNavigating ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      {isNavigating ? 'Pause' : 'Auto Navigate'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setStreetViewMode(false)}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Exit Street View
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full h-96 bg-gradient-to-br from-green-900 via-blue-900 to-purple-900 rounded-lg relative overflow-hidden">
+                  {/* Street View Panorama */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <div className="w-32 h-32 border-4 border-white/30 rounded-full flex items-center justify-center mb-4 mx-auto animate-pulse">
+                        <Navigation className="w-16 h-16" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">3D Street View Active</h3>
+                      <p className="text-white/80">
+                        {selectedStreetView.waypoints[currentWaypoint]?.title || 'Loading location...'}
+                      </p>
+                      <p className="text-white/60 text-sm mt-2">
+                        {selectedStreetView.waypoints[currentWaypoint]?.description}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Interactive Elements Overlay */}
+                  {showInteractiveElements && selectedStreetView.waypoints[currentWaypoint]?.interactiveElements.map((element) => (
+                    <button
+                      key={element.id}
+                      className="absolute bg-blue-500/80 text-white p-2 rounded-full hover:bg-blue-600/90 transition-colors animate-pulse"
+                      style={{
+                        left: `${element.position.x}%`,
+                        top: `${element.position.y}%`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                      onClick={() => handleInteractiveElementClick(element)}
+                    >
+                      <Info className="w-4 h-4" />
+                    </button>
+                  ))}
+                  
+                  {/* Street View Controls */}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="bg-black/50 rounded-lg p-4 backdrop-blur-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleNavigateStreetView('backward')}
+                            disabled={currentWaypoint === 0}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleNavigateStreetView('forward')}
+                            disabled={currentWaypoint >= selectedStreetView.waypoints.length - 1}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setShowInteractiveElements(!showInteractiveElements)}
+                          >
+                            <Eye className="w-4 h-4" />
+                            {showInteractiveElements ? 'Hide' : 'Show'} Hotspots
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm">Speed:</span>
+                          <Slider
+                            value={[navigationSpeed]}
+                            onValueChange={(value) => setNavigationSpeed(value[0])}
+                            max={3}
+                            min={0.5}
+                            step={0.5}
+                            className="w-20"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-white text-sm">
+                          <span>Street Tour Progress</span>
+                          <span>{Math.round(streetViewProgress)}%</span>
+                        </div>
+                        <Progress value={streetViewProgress} className="bg-white/30" />
+                        <div className="flex items-center justify-between text-white/80 text-xs">
+                          <span>Waypoint {currentWaypoint + 1} of {selectedStreetView.waypoints.length}</span>
+                          <span>{selectedStreetView.duration} min tour</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Cultural Information Sidebar */}
+                  {selectedStreetView.waypoints[currentWaypoint]?.culturalContext && (
+                    <div className="absolute top-4 right-4 bg-black/60 text-white p-4 rounded-lg backdrop-blur-sm max-w-xs">
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        Cultural Context
+                      </h4>
+                      <p className="text-sm text-white/90">
+                        {selectedStreetView.waypoints[currentWaypoint].culturalContext}
+                      </p>
+                      {selectedStreetView.waypoints[currentWaypoint]?.tribalSignificance && (
+                        <div className="mt-3">
+                          <h5 className="font-medium text-yellow-300 text-sm mb-1">Tribal Significance:</h5>
+                          <p className="text-xs text-white/80">
+                            {selectedStreetView.waypoints[currentWaypoint].tribalSignificance}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Waypoint Navigation */}
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {selectedStreetView.waypoints.map((waypoint, index) => (
+                    <Card
+                      key={waypoint.id}
+                      className={`cursor-pointer transition-all ${
+                        index === currentWaypoint ? 'ring-2 ring-primary' : 'hover:shadow-lg'
+                      }`}
+                      onClick={() => {
+                        setCurrentWaypoint(index);
+                        setStreetViewProgress((index / (selectedStreetView.waypoints.length - 1)) * 100);
+                      }}
+                    >
+                      <CardContent className="p-3 text-center">
+                        <Navigation className="w-6 h-6 mx-auto mb-2 text-primary" />
+                        <h4 className="font-medium text-sm mb-1">{waypoint.title}</h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {waypoint.description}
+                        </p>
+                        <Badge variant="outline" className="text-xs mt-2">
+                          {waypoint.interactiveElements.length} hotspots
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {streetViewTours.map((streetView) => (
+                <Card key={streetView.id} className="overflow-hidden hover:shadow-xl transition-shadow">
+                  <div className="relative">
+                    <div className="w-full h-48 bg-gradient-to-br from-green-600 to-blue-600 flex items-center justify-center">
+                      <Navigation className="w-16 h-16 text-white" />
+                    </div>
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <Badge variant="secondary">
+                        {streetView.difficulty}
+                      </Badge>
+                      <Badge variant="outline" className="bg-black/50 text-white border-white/30">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {streetView.duration}min
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-2">{streetView.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{streetView.description}</p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {streetView.waypoints.length} stops
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {streetView.culturalSites.length} cultural sites
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1">
+                        {streetView.highlights.slice(0, 3).map((highlight, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {highlight}
+                          </Badge>
+                        ))}
+                        {streetView.highlights.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{streetView.highlights.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      className="w-full mt-4"
+                      onClick={() => handleStreetViewStart(streetView)}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : (
+                        <Navigation className="w-4 h-4 mr-2" />
+                      )}
+                      Start Street Tour
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
+
+      {/* Interactive Element Details Modal */}
+      {selectedElement && (
+        <Dialog open={!!selectedElement} onOpenChange={() => setSelectedElement(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 capitalize">
+                <Info className="w-5 h-5" />
+                {selectedElement.type.replace('-', ' ')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p>{selectedElement.content}</p>
+              {selectedElement.type === 'audio-guide' && (
+                <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={handlePlayPause}>
+                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    {isPlaying ? 'Pause' : 'Play'} Audio Guide
+                  </Button>
+                  <div className="flex items-center gap-2 flex-1">
+                    <Volume2 className="w-4 h-4" />
+                    <Slider
+                      value={[volume]}
+                      onValueChange={handleVolumeChange}
+                      max={100}
+                      step={1}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Booking Dialog */}
       <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
