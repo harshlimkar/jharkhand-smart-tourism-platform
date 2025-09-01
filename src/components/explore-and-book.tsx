@@ -1,62 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ARVRPreviewComponent } from '@/components/ar-vr-preview';
-import { 
-  Search, 
-  Map, 
-  MessageCircle, 
-  Sparkles, 
-  MapPin, 
-  Calendar, 
-  Users, 
-  IndianRupee, 
-  Phone, 
-  Shield, 
-  Hospital, 
-  Car, 
-  Plane, 
-  Train, 
-  Bed, 
-  Camera, 
-  Utensils, 
-  Mountain, 
-  Sun, 
-  Cloud, 
-  CloudRain,
-  Heart,
-  Clock,
-  Star,
-  Filter,
-  Send,
-  Loader2,
-  Eye,
-  Headphones,
-  Globe,
-  Mic,
-  MicOff,
-  Volume2,
-  VolumeX,
-  Navigation,
-  Compass,
-  Wifi,
-  Smartphone,
-  QrCode,
-  Languages,
-  Brain,
-  Zap,
-  Bot
-} from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { IndianRupee, Search, MapPin, Calendar, Users, MessageCircle, Mic, MicOff, Volume2, Heart, Star, Eye, Camera, Play, Brain, Sparkles, Loader2, Navigation, Compass, Shield, Phone, Hospital, Zap, Mountain, Sun, Utensils } from "lucide-react";
+import { ARVRPreviewComponent } from "./ar-vr-preview";
 
 interface ExploreAndBookProps {
   language: 'en' | 'hi' | 'tribal';
@@ -100,7 +52,65 @@ interface AIItinerary {
   personalizedFeatures: string[];
 }
 
-export const ExploreAndBook: React.FC<ExploreAndBookProps> = ({ language }) => {
+const destinations = [
+  {
+    id: 1,
+    name: "Netarhat Hill Station",
+    location: "Latehar District",
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/3ba8390e-0a2a-430c-b3e9-ff05d2d681ae/generated_images/stunning-landscape-of-netarhat-hill-stat-9704a391-20250901064237.jpg",
+    priceRange: "₹15,000-25,000",
+    rating: 4.8,
+    description: "Queen of Chotanagpur",
+    highlights: ["Sunrise Views", "Pleasant Climate", "Trekking Trails"],
+    culturalSignificance: "Known as the 'Queen of Chotanagpur', sacred sunset viewing spot for local tribes"
+  },
+  {
+    id: 2,
+    name: "Hundru Falls",
+    location: "Ranchi District", 
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/3ba8390e-0a2a-430c-b3e9-ff05d2d681ae/generated_images/hundru-falls-waterfall-in-jharkhand%2c-i-198b4482-20250901064252.jpg",
+    priceRange: "₹8,000-15,000",
+    rating: 4.6,
+    description: "320 feet waterfall majesty",
+    highlights: ["Monsoon Beauty", "Photography", "Natural Pool"],
+    culturalSignificance: "Sacred water source for Munda tribes, traditional purification ceremonies held here"
+  },
+  {
+    id: 3,
+    name: "Betla National Park",
+    location: "Latehar & Gumla Districts",
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/3ba8390e-0a2a-430c-b3e9-ff05d2d681ae/generated_images/betla-national-park-wildlife-sanctuary-i-d7669a94-20250901064313.jpg",
+    priceRange: "₹12,000-20,000", 
+    rating: 4.5,
+    description: "Wildlife sanctuary paradise",
+    highlights: ["Tiger Safari", "Elephant Spotting", "Tribal Villages"],
+    culturalSignificance: "Ancient hunting grounds of tribal kings, traditional wildlife conservation practices"
+  },
+  {
+    id: 4,
+    name: "Deoghar Temple Complex",
+    location: "Deoghar District",
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/3ba8390e-0a2a-430c-b3e9-ff05d2d681ae/generated_images/deoghar-temple-complex-in-jharkhand---sa-0a342bc3-20250901064348.jpg",
+    priceRange: "₹10,000-18,000",
+    rating: 4.7,
+    description: "Spiritual pilgrimage destination",
+    highlights: ["Baidyanath Temple", "Kanwar Yatra", "Sacred Rituals"],
+    culturalSignificance: "One of 12 Jyotirlingas, major pilgrimage site blending Hindu and tribal traditions"
+  },
+  {
+    id: 5,
+    name: "Tribal Heritage Village",
+    location: "Santhal Parganas",
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/3ba8390e-0a2a-430c-b3e9-ff05d2d681ae/generated_images/traditional-santhal-tribal-village-in-jh-de523568-20250901064303.jpg",
+    priceRange: "₹6,000-12,000",
+    rating: 4.9,
+    description: "Authentic tribal culture experience",
+    highlights: ["Traditional Dances", "Handicraft Workshops", "Community Meals"],
+    culturalSignificance: "Living heritage village showcasing Santhal tribal customs and sustainable practices"
+  }
+];
+
+export function ExploreAndBook({ language }: ExploreAndBookProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [budget, setBudget] = useState([50000]);
   const [duration, setDuration] = useState('');
@@ -117,6 +127,7 @@ export const ExploreAndBook: React.FC<ExploreAndBookProps> = ({ language }) => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [currentItinerary, setCurrentItinerary] = useState<AIItinerary | null>(null);
   const [showARVRModal, setShowARVRModal] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<any>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [weatherData, setWeatherData] = useState({
     location: 'Ranchi, Jharkhand',
@@ -128,83 +139,17 @@ export const ExploreAndBook: React.FC<ExploreAndBookProps> = ({ language }) => {
     ]
   });
 
-  const destinations: Destination[] = [
-    {
-      id: '1',
-      name: 'Netarhat',
-      description: 'Hill station known as Queen of Chotanagpur',
-      image: '/api/placeholder/300/200',
-      rating: 4.5,
-      priceRange: '₹15,000-25,000',
-      duration: '2-3 days',
-      coordinates: { lat: 23.4667, lng: 84.2500 },
-      culturalSignificance: 'Sacred sunrise point for tribal communities',
-      tribalCommunity: 'Munda and Oraon tribes',
-      bestVisitTime: 'October to March',
-      arAvailable: true,
-      vrTours: 3
-    },
-    {
-      id: '2',
-      name: 'Patratu Valley',
-      description: 'Scenic valley with dam and hills',
-      image: '/api/placeholder/300/200',
-      rating: 4.3,
-      priceRange: '₹8,000-15,000',
-      duration: '1-2 days',
-      coordinates: { lat: 23.6100, lng: 85.1900 },
-      culturalSignificance: 'Traditional fishing grounds',
-      tribalCommunity: 'Ho and Santhal communities',
-      bestVisitTime: 'November to February',
-      arAvailable: true,
-      vrTours: 2
-    },
-    {
-      id: '3',
-      name: 'Betla National Park',
-      description: 'Wildlife sanctuary with tigers and elephants',
-      image: '/api/placeholder/300/200',
-      rating: 4.6,
-      priceRange: '₹12,000-20,000',
-      duration: '2-3 days',
-      coordinates: { lat: 23.8730, lng: 84.1900 },
-      culturalSignificance: 'Sacred forest for tribal communities',
-      tribalCommunity: 'Birhor and Kharia tribes',
-      bestVisitTime: 'November to March',
-      arAvailable: true,
-      vrTours: 4
-    },
-    {
-      id: '4',
-      name: 'Hundru Falls',
-      description: 'Magnificent waterfall surrounded by forests',
-      image: '/api/placeholder/300/200',
-      rating: 4.4,
-      priceRange: '₹6,000-12,000',
-      duration: '1 day',
-      coordinates: { lat: 23.4372, lng: 85.5908 },
-      culturalSignificance: 'Sacred water source',
-      tribalCommunity: 'Munda tribal area',
-      bestVisitTime: 'July to October',
-      arAvailable: true,
-      vrTours: 2
-    },
-    {
-      id: '5',
-      name: 'Deoghar',
-      description: 'Sacred temple town with spiritual significance',
-      image: '/api/placeholder/300/200',
-      rating: 4.7,
-      priceRange: '₹10,000-18,000',
-      duration: '2-4 days',
-      coordinates: { lat: 24.4833, lng: 86.7000 },
-      culturalSignificance: 'Ancient pilgrimage site',
-      tribalCommunity: 'Multiple tribal communities',
-      bestVisitTime: 'October to March',
-      arAvailable: true,
-      vrTours: 5
-    }
-  ];
+  const filteredDestinations = destinations.filter(d => {
+    // Filter based on interests, budget, and location proximity
+    const budgetMatch = parseInt(d.priceRange.split('-')[0].replace('₹', '').replace(',', '')) <= budget[0];
+    const interestMatch = interests.length === 0 || interests.some(interest => {
+      if (interest === 'wildlife') return d.name.includes('National Park') || d.name.includes('Falls');
+      if (interest === 'temples') return d.name.includes('Deoghar');
+      if (interest === 'nature') return d.name.includes('Valley') || d.name.includes('Netarhat');
+      return true;
+    });
+    return budgetMatch && interestMatch;
+  });
 
   const interestOptions = [
     { id: 'wildlife', label: 'Wildlife', icon: Camera },
@@ -499,9 +444,44 @@ export const ExploreAndBook: React.FC<ExploreAndBookProps> = ({ language }) => {
   }, [language, chatMessages.length]);
 
   return (
-    <div className="space-y-6 p-6 max-w-6xl mx-auto">
-      {/* Enhanced Search Header */}
-      <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 text-white">
+    <div className="space-y-6">
+      {/* Live Photos Gallery */}
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-emerald-50 to-blue-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="w-5 h-5 text-emerald-600" />
+            {language === 'hi' ? 'लाइव फोटो गैलरी' : language === 'tribal' ? 'ᱡᱚᱽ ᱞᱟᱦᱟ ᱪᱤᱛᱟᱹᱨ' : 'Live Photo Gallery'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {destinations.slice(0, 4).map((destination) => (
+              <div key={destination.id} className="relative group cursor-pointer rounded-lg overflow-hidden">
+                <img 
+                  src={destination.image} 
+                  alt={destination.name}
+                  className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-2 left-2 text-white">
+                  <div className="text-xs font-medium">{destination.name}</div>
+                  <div className="text-xs opacity-90 flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    Live View
+                  </div>
+                </div>
+                <Badge className="absolute top-2 right-2 bg-red-500 text-white text-xs">
+                  <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                  LIVE
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Search Controls */}
+      <Card className="border-0 shadow-lg">
         <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             <div className="flex-1 relative">
@@ -510,23 +490,10 @@ export const ExploreAndBook: React.FC<ExploreAndBookProps> = ({ language }) => {
                 placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/70"
+                className="pl-10"
               />
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={getCurrentLocation}
-                disabled={isLoadingLocation}
-              >
-                {isLoadingLocation ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <Navigation className="w-4 h-4 mr-2" />
-                )}
-                {language === 'hi' ? 'स्थान' : 'Location'}
-              </Button>
               <Dialog open={showARVRModal} onOpenChange={setShowARVRModal}>
                 <DialogTrigger asChild>
                   <Button variant="secondary" size="sm">
@@ -543,501 +510,113 @@ export const ExploreAndBook: React.FC<ExploreAndBookProps> = ({ language }) => {
               </Dialog>
             </div>
           </div>
-          
-          {userLocation && (
-            <div className="mt-3 flex items-center gap-2 text-sm">
-              <Compass className="w-4 h-4" />
-              <span>Location detected: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}</span>
-            </div>
-          )}
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Enhanced Filters & Controls */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Preferences */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                {t.preferences}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Budget */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <IndianRupee className="w-4 h-4" />
-                  {t.budget}: ₹{budget[0].toLocaleString()}
-                </label>
-                <Slider
-                  value={budget}
-                  onValueChange={setBudget}
-                  max={100000}
-                  min={5000}
-                  step={5000}
-                  className="w-full"
-                />
-              </div>
-
-              {/* Duration */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  {t.duration}
-                </label>
-                <Select value={duration} onValueChange={setDuration}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select duration" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1-day">1 Day</SelectItem>
-                    <SelectItem value="2-3-days">2-3 Days</SelectItem>
-                    <SelectItem value="4-7-days">4-7 Days</SelectItem>
-                    <SelectItem value="1-week+">1+ Week</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Interests */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium">{t.interests}</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {interestOptions.map((interest) => {
-                    const Icon = interest.icon;
-                    return (
-                      <div key={interest.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={interest.id}
-                          checked={interests.includes(interest.id)}
-                          onCheckedChange={() => handleInterestToggle(interest.id)}
-                        />
-                        <label 
-                          htmlFor={interest.id}
-                          className="text-sm flex items-center gap-1 cursor-pointer"
-                        >
-                          <Icon className="w-3 h-3" />
-                          {interest.label}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Transport */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Car className="w-4 h-4" />
-                  {t.transport}
-                </label>
-                <Select value={transportMode} onValueChange={setTransportMode}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select transport" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="car">
-                      <div className="flex items-center gap-2">
-                        <Car className="w-4 h-4" />
-                        Car/Taxi
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="train">
-                      <div className="flex items-center gap-2">
-                        <Train className="w-4 h-4" />
-                        Train
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="bus">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4" />
-                        Bus
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Accommodation */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Bed className="w-4 h-4" />
-                  {t.accommodation}
-                </label>
-                <Select value={accommodationType} onValueChange={setAccommodationType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select accommodation" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hotel">Hotel</SelectItem>
-                    <SelectItem value="resort">Resort</SelectItem>
-                    <SelectItem value="guesthouse">Guest House</SelectItem>
-                    <SelectItem value="homestay">Homestay</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced AI Itinerary Generator */}
-          <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5 text-purple-600" />
-                {t.generateItinerary}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={generatePersonalizedItinerary}
-                disabled={isGeneratingItinerary}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+      {/* Destinations Grid with Images */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {filteredDestinations.map((destination) => (
+          <Card key={destination.id} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg overflow-hidden">
+            <div className="relative">
+              <img 
+                src={destination.image} 
+                alt={destination.name}
+                className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <Badge className="absolute top-3 right-3 bg-white/90 text-emerald-600">
+                <Star className="w-3 h-3 mr-1 fill-current" />
+                {destination.rating}
+              </Badge>
+              <Button
+                size="sm"
+                className="absolute bottom-3 right-3 bg-white/90 text-emerald-600 hover:bg-white"
+                onClick={() => setSelectedDestination(destination)}
               >
-                {isGeneratingItinerary ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    AI Processing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate Smart Plan
-                  </>
-                )}
+                <Play className="w-4 h-4 mr-1" />
+                AR View
               </Button>
-              
-              {currentItinerary && (
-                <div className="mt-4 p-4 bg-white rounded-lg border">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-sm">{currentItinerary.title}</h4>
-                    <Badge variant="secondary" className="text-xs">
-                      {currentItinerary.confidence}% match
-                    </Badge>
-                  </div>
-                  <div className="space-y-2 text-xs text-muted-foreground">
-                    <div>Duration: {currentItinerary.duration} days</div>
-                    <div>Cost: ₹{currentItinerary.totalCost.toLocaleString()}</div>
-                    <div>Destinations: {currentItinerary.destinations.join(', ')}</div>
-                  </div>
-                  <div className="mt-3 space-y-1">
-                    {currentItinerary.personalizedFeatures.slice(0, 2).map((feature, index) => (
-                      <div key={index} className="flex items-center gap-1 text-xs text-green-600">
-                        <Zap className="w-3 h-3" />
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              <p className="text-xs text-muted-foreground mt-2">
-                {language === 'hi' 
-                  ? 'AI आपकी प्राथमिकताओं के आधार पर व्यक्तिगत यात्रा योजना बनाएगा'
-                  : 'AI creates personalized itinerary based on your preferences'
-                }
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Emergency Contacts */}
-          <Card className="border-red-200 bg-red-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-700">
-                <Shield className="w-5 h-5" />
-                {t.emergency}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100"
-                onClick={() => handleEmergencyCall('police')}
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                Police: 100
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100"
-                onClick={() => handleEmergencyCall('hospital')}
-              >
-                <Hospital className="w-4 h-4 mr-2" />
-                Medical: 108
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100"
-                onClick={() => handleEmergencyCall('tourist')}
-              >
-                <MapPin className="w-4 h-4 mr-2" />
-                Tourist Helpline: 1363
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column - Enhanced Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Enhanced Weather Widget */}
-          <Card>
+            </div>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Sun className="w-8 h-8 text-yellow-500" />
-                  <div>
-                    <p className="font-medium">{weatherData.location}</p>
-                    <p className="text-sm text-muted-foreground">{weatherData.temperature}°C • {weatherData.condition}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {weatherData.forecast.map((day, index) => (
-                    <div key={index} className="text-center">
-                      {day.condition === 'Cloudy' && <Cloud className="w-5 h-5 mx-auto text-gray-500" />}
-                      {day.condition === 'Rainy' && <CloudRain className="w-5 h-5 mx-auto text-blue-500" />}
-                      <p className="text-xs">{day.day}</p>
-                      <p className="text-xs font-medium">{day.temp}°C</p>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-semibold text-lg group-hover:text-emerald-600 transition-colors">
+                  {destination.name}
+                </h3>
+                <Button variant="ghost" size="sm" className="text-rose-500 hover:text-rose-600">
+                  <Heart className="w-4 h-4" />
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Interactive Map with Real-time Features */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Map className="w-5 h-5" />
-                {t.map}
-                {userLocation && (
-                  <Badge variant="secondary" className="ml-2">
-                    <Navigation className="w-3 h-3 mr-1" />
-                    Live Location
+              <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                {destination.location}
+              </p>
+              <p className="text-sm mb-3">{destination.description}</p>
+              <div className="flex flex-wrap gap-1 mb-3">
+                {destination.highlights.map((highlight, index) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {highlight}
                   </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center relative">
-                <div className="text-center">
-                  <Map className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">Interactive map with real-time data</p>
-                  <p className="text-sm text-muted-foreground">Explore destinations across Jharkhand</p>
-                </div>
-                
-                {/* Simulated location markers */}
-                {userLocation && (
-                  <div className="absolute top-4 right-4 bg-green-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                    <Wifi className="w-3 h-3" />
-                    Connected
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <Button variant="outline" size="sm" onClick={getCurrentLocation}>
-                  <Compass className="w-4 h-4 mr-2" />
-                  Find Nearby
-                </Button>
-                <Button variant="outline" size="sm">
-                  <QrCode className="w-4 h-4 mr-2" />
-                  AR Markers
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced Popular Destinations */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                {t.destinations}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {destinations.map((destination) => (
-                  <div key={destination.id} className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-lg mb-3">
-                      <div className="w-full h-32 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-                        <Mountain className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="absolute top-2 left-2 flex gap-1">
-                        {destination.arAvailable && (
-                          <Badge variant="secondary" className="text-xs">
-                            <Eye className="w-3 h-3 mr-1" />
-                            AR
-                          </Badge>
-                        )}
-                        {destination.vrTours && destination.vrTours > 0 && (
-                          <Badge variant="secondary" className="text-xs">
-                            <Headphones className="w-3 h-3 mr-1" />
-                            {destination.vrTours} VR
-                          </Badge>
-                        )}
-                      </div>
-                      <Button 
-                        size="sm" 
-                        className="absolute top-2 right-2 bg-white/90 text-black hover:bg-white"
-                      >
-                        <Heart className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-medium group-hover:text-primary transition-colors">
-                        {destination.name}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {destination.description}
-                      </p>
-                      {destination.tribalCommunity && (
-                        <p className="text-xs text-orange-600 flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {destination.tribalCommunity}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span>{destination.rating}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{destination.duration}</span>
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-green-600">
-                        {destination.priceRange}
-                      </p>
-                      {destination.bestVisitTime && (
-                        <p className="text-xs text-blue-600">
-                          Best time: {destination.bestVisitTime}
-                        </p>
-                      )}
-                    </div>
-                  </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Searches */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Recent Searches & Saved Trips
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {savedTrips.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-4">
-                    {language === 'hi' 
-                      ? 'अभी तक कोई सहेजी गई यात्रा नहीं। अपनी यात्रा की योजना शुरू करें!'
-                      : 'No saved trips yet. Start planning your journey!'
-                    }
-                  </p>
-                ) : (
-                  savedTrips.map((trip, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 hover:bg-muted rounded">
-                      <span className="text-sm">{trip}</span>
-                      <Badge variant="secondary">Saved</Badge>
-                    </div>
-                  ))
-                )}
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-emerald-600">{destination.priceRange}</span>
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+                  {language === 'hi' ? 'देखें' : language === 'tribal' ? 'ᱧᱮᱞ' : 'Explore'}
+                </Button>
               </div>
             </CardContent>
           </Card>
-
-          {/* Enhanced Multilingual Chatbot Interface */}
-          <Card className="border-2 border-blue-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="w-5 h-5 text-blue-600" />
-                {t.chatbot}
-                <div className="flex items-center gap-2 ml-auto">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAudioEnabled(!audioEnabled)}
-                  >
-                    {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                  </Button>
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Languages className="w-3 h-3" />
-                    {language.toUpperCase()}
-                  </Badge>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <ScrollArea className="h-40 w-full border rounded-md p-3">
-                  {chatMessages.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-8">
-                      {language === 'hi' 
-                        ? 'नमस्ते! मैं आपका झारखंड पर्यटन सहायक हूं। मुझसे कुछ भी पूछें!'
-                        : 'Hi! I\'m your Jharkhand tourism assistant. Ask me anything!'
-                      }
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {chatMessages.map((message) => (
-                        <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[80%] p-2 rounded-lg text-sm ${
-                            message.isUser 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-muted'
-                          }`}>
-                            {message.message}
-                            {!message.isUser && message.aiConfidence && (
-                              <div className="flex items-center gap-1 mt-1 text-xs opacity-70">
-                                <Zap className="w-3 h-3" />
-                                {message.aiConfidence}% confidence
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={language === 'hi' ? 'स्थान, मौसम, बुकिंग के बारे में पूछें...' : 'Ask about places, weather, bookings...'}
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={toggleVoiceRecognition}
-                    className={isListening ? 'bg-red-100 border-red-300' : ''}
-                  >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </Button>
-                  <Button onClick={handleSendMessage} size="sm">
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-                {isListening && (
-                  <div className="text-center text-sm text-blue-600 flex items-center justify-center gap-2">
-                    <div className="animate-pulse w-2 h-2 bg-red-500 rounded-full"></div>
-                    {language === 'hi' ? 'सुन रहा हूं...' : 'Listening...'}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        ))}
       </div>
+
+      {/* AR/VR Preview Modal */}
+      {selectedDestination && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <ARVRPreviewComponent 
+              destination={selectedDestination}
+              language={language}
+              onClose={() => setSelectedDestination(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Emergency Contacts */}
+      <Card className="border-red-200 bg-red-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-700">
+            <Shield className="w-5 h-5" />
+            {t.emergency}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100"
+          >
+            <Phone className="w-4 h-4 mr-2" />
+            Police: 100
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100"
+          >
+            <Hospital className="w-4 h-4 mr-2" />
+            Medical: 108
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100"
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            Tourist Helpline: 1363
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
-};
+}
